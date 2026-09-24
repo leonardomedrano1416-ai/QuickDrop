@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0d12" />
+
+  <title>QuickDrop</title>
+
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --card: #151821;
+      --card2: #1c202b;
+      --text: #f5f7fb;
+      --muted: #8d95a5;
+      --accent: #7c9cff;
+      --accent2: #9db2ff;
+      --green: #56d49b;
+      --orange: #ffb35c;
+      --red: #ff6b76;
+      --border: rgba(255,255,255,.07);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      max-width: 650px;
+      margin: auto;
+      min-height: 100vh;
+      padding-bottom: 110px;
+    }
+
+    header {
+      padding: 28px 20px 16px;
+    }
+
+    .eyebrow {
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1.7px;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin: 0;
+      letter-spacing: -1.2px;
+    }
+
+    .date {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    main {
+      padding: 0 16px;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 18px 4px 10px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .hero {
+      background:
+        radial-gradient(circle at top right, rgba(124,156,255,.18), transparent 45%),
+        var(--card);
+    }
+
+    .hero-title {
+      font-size: 23px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .hero-subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .quick-button {
+      width: 100%;
+      border: 0;
+      border-radius: 16px;
+      padding: 15px;
+      margin-top: 15px;
+      background: var(--accent);
+      color: #07102c;
+      font-weight: 900;
+      font-size: 15px;
+    }
+
+    .item {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .item:last-child {
+      border-bottom: 0;
+    }
+
+    .icon {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      display: grid;
+      place-items: center;
+      background: var(--card2);
+      border-radius: 13px;
+      font-size: 20px;
+    }
+
+    .item-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .item-title {
+      font-weight: 750;
+      font-size: 15px;
+    }
+
+    .item-meta {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .badge {
+      padding: 5px 8px;
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 800;
+      background: var(--card2);
+      color: var(--muted);
+    }
+
+    .progress-number {
+      font-size: 29px;
+      font-weight: 900;
+    }
+
+    .progress-number small {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .progress-track {
+      height: 10px;
+      border-radius: 100px;
+      background: var(--card2);
+      overflow: hidden;
+      margin: 12px 0 7px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      border-radius: inherit;
+      transition: width .3s ease;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .mini-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      min-height: 105px;
+    }
+
+    .mini-icon {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    .mini-title {
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .mini-subtitle {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      padding: 25px 10px;
+      font-size: 13px;
+    }
+
+    .add-btn {
+      border: 0;
+      background: var(--card2);
+      color: var(--accent2);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    nav {
+      position: fixed;
+      z-index: 10;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(650px, 100%);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      background: rgba(14,16,22,.94);
+      backdrop-filter: blur(18px);
+      border-top: 1px solid var(--border);
+      padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+    }
+
+    .nav-btn {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      padding: 7px 2px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .nav-btn .nav-icon {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 3px;
+    }
+
+    .nav-btn.active {
+      color: var(--accent2);
+    }
+
+    .drop-nav .nav-icon {
+      width: 38px;
+      height: 38px;
+      margin: -15px auto 2px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: var(--accent);
+      color: #07102c;
+      font-size: 25px;
+      box-shadow: 0 6px 20px rgba(124,156,255,.25);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      background: rgba(0,0,0,.65);
+      padding: 20px;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-sheet {
+      width: min(600px, 100%);
+      background: #171a23;
+      border: 1px solid var(--border);
+      border-radius: 25px;
+      padding: 20px;
+      margin-bottom: env(safe-area-inset-bottom);
+    }
+
+    .modal-sheet h2 {
+      margin: 0 0 5px;
+    }
+
+    .modal-sheet p {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 16px;
+    }
+
+    textarea,
+    input,
+    select {
+      width: 100%;
+      background: #0f1118;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 13px;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      min-height: 95px;
+      resize: none;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .cancel {
+      border: 0;
+      border-radius: 14px;
+      background: var(--card2);
+      color: var(--text);
+      padding: 13px;
+      font-weight: 800;
+    }
+
+    .save {
+      border: 0;
+      border-radius: 14px;
+      background: var(--accent);
+      color: #07102c;
+      padding: 13px;
+      font-weight: 900;
+    }
+
+    .comp-row {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comp-row:last-child {
+      border-bottom: 0;
+    }
+
+    .check {
+      width: 25px;
+      height: 25px;
+      border-radius: 8px;
+      border: 2px solid #343947;
+      background: transparent;
+      color: #07102c;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      flex: 0 0 25px;
+    }
+
+    .check.done {
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .comp-name {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .danger {
+      color: var(--red);
+    }
+
+    @media (min-width: 650px) {
+      body {
+        background: #07090d;
+      }
+
+      .app {
+        background: var(--bg);
+        border-left: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header>
+    <div class="eyebrow">QUICKDROP</div>
+    <h1 id="pageTitle">Home</h1>
+    <div class="date" id="todayDate"></div>
+  </header>
+
+  <main>
+
+    <!-- HOME -->
+    <section id="home" class="page active">
+
+      <div class="card hero">
+        <div class="hero-title">What's next?</div>
+        <div class="hero-subtitle">
+          School, clinical, appointments and everything else — all in one place.
+        </div>
+
+        <button class="quick-button" onclick="openDrop()">
+          ＋ Quick Drop
+        </button>
+      </div>
+
+      <div class="section-title">
+        <h2>Today</h2>
+        <span id="todayCount">0 items</span>
+      </div>
+
+      <div class="card" id="todayList">
+        <div class="empty">Nothing scheduled for today.</div>
+      </div>
+
+      <div class="section-title">
+        <h2>Coming Up</h2>
+      </div>
+
+      <div class="card" id="upcomingList">
+        <div class="empty">Your upcoming drops will appear here.</div>
+      </div>
+
+      <div class="section-title">
+        <h2>RT Progress</h2>
+      </div>
+
+      <div class="card">
+        <div class="progress-number">
+          <span id="homeCompleted">0</span>
+          <small>/ <span id="homeTotal">0</span> competencies</small>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill" id="homeProgress"></div>
+        </div>
+
+        <div class="progress-meta">
+          <span id="homePercent">0% complete</span>
+          <span id="homeRemaining">0 remaining</span>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- RT -->
+    <section id="rt" class="page">
+
+      <div class="grid">
+        <div class="mini-card">
+          <div class="mini-icon">📚</div>
+          <div class="mini-title">Assignments</div>
+          <div class="mini-subtitle" id="assignmentCount">0 active</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-icon">🧪</div>
+          <div class="mini-title">Quizzes & Tests</div>
+          <div class="mini-subtitle" id="testCount">0 upcoming</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-icon">🏥</div>
+          <div class="mini-title">Clinical</div>
+          <div class="mini-subtitle" id="clinicalCount">0 items</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-icon">📝</div>
+          <div class="mini-title">RT Notes</div>
+          <div class="mini-subtitle">Coming soon</div>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <h2>RT Items</h2>
+        <button class="add-btn" onclick="openDrop('School')">＋ Add</button>
+      </div>
+
+      <div class="card" id="rtList">
+        <div class="empty">No RT items yet.</div>
+      </div>
+
+    </section>
+
+
+    <!-- QUICK DROP PAGE -->
+    <section id="drop" class="page">
+
+      <div class="card hero">
+        <div class="hero-title">Drop anything.</div>
+        <div class="hero-subtitle">
+          Assignment, haircut, test, clinical note, reminder — whatever you need to remember.
+        </div>
+
+        <button class="quick-button" onclick="openDrop()">
+          ＋ Create Drop
+        </button>
+      </div>
+
+      <div class="section-title">
+        <h2>Recent Drops</h2>
+      </div>
+
+      <div class="card" id="recentList">
+        <div class="empty">Nothing dropped yet.</div>
+      </div>
+
+    </section>
+
+
+    <!-- COMPS -->
+    <section id="comps" class="page">
+
+      <div class="card">
+        <div class="progress-number">
+          <span id="completedComps">0</span>
+          <small>/ <span id="totalComps">0</span> completed</small>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill" id="compProgress"></div>
+        </div>
+
+        <div class="progress-meta">
+          <span id="compPercent">0% complete</span>
+          <span id="remainingComps">0 remaining</span>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <h2>Competencies</h2>
+        <button class="add-btn" onclick="addComp()">＋ Add</button>
+      </div>
+
+      <div class="card" id="compList">
+        <div class="empty">Add your required competencies here.</div>
+      </div>
+
+    </section>
+
+
+    <!-- PERSONAL -->
+    <section id="personal" class="page">
+
+      <div class="grid">
+        <div class="mini-card">
+          <div class="mini-icon">📅</div>
+          <div class="mini-title">Appointments</div>
+          <div class="mini-subtitle" id="appointmentCount">0 upcoming</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-icon">✅</div>
+          <div class="mini-title">Tasks</div>
+          <div class="mini-subtitle" id="personalTaskCount">0 active</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-icon">💳</div>
+          <div class="mini-title">Bills</div>
+          <div class="mini-subtitle" id="billCount">0 upcoming</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-icon">🎯</div>
+          <div class="mini-title">Other</div>
+          <div class="mini-subtitle">Anything else</div>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <h2>Personal</h2>
+        <button class="add-btn" onclick="openDrop('Personal')">＋ Add</button>
+      </div>
+
+      <div class="card" id="personalList">
+        <div class="empty">No personal items yet.</div>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+
+<!-- NAVIGATION -->
+<nav>
+
+  <button class="nav-btn active" onclick="showPage('home',this)">
+    <span class="nav-icon">⌂</span>
+    Home
+  </button>
+
+  <button class="nav-btn" onclick="showPage('rt',this)">
+    <span class="nav-icon">☢️</span>
+    RT
+  </button>
+
+  <button class="nav-btn drop-nav" onclick="showPage('drop',this)">
+    <span class="nav-icon">＋</span>
+    Drop
+  </button>
+
+  <button class="nav-btn" onclick="showPage('comps',this)">
+    <span class="nav-icon">🩻</span>
+    Comps
+  </button>
+
+  <button class="nav-btn" onclick="showPage('personal',this)">
+    <span class="nav-icon">👤</span>
+    Personal
+  </button>
+
+</nav>
+
+
+<!-- ADD DROP MODAL -->
+<div class="modal" id="dropModal">
+
+  <div class="modal-sheet">
+
+    <h2>Quick Drop</h2>
+    <p>Add something you don't want to forget.</p>
+
+    <textarea
+      id="dropText"
+      placeholder="Example: Haircut Friday at 5 PM"
+    ></textarea>
+
+    <select id="dropCategory">
+      <option value="Personal">Personal</option>
+      <option value="Assignment">RT · Assignment</option>
+      <option value="Quiz">RT · Quiz</option>
+      <option value="Test">RT · Test</option>
+      <option value="Clinical">RT · Clinical</option>
+      <option value="Appointment">Appointment</option>
+      <option value="Task">Task</option>
+      <option value="Bill">Bill</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <div class="row">
+      <input type="date" id="dropDate">
+      <input type="time" id="dropTime">
+    </div>
+
+    <div class="modal-actions">
+      <button class="cancel" onclick="closeDrop()">Cancel</button>
+      <button class="save" onclick="saveDrop()">Add Drop</button>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+
+  const STORAGE_DROPS = "quickdrop_drops_v1";
+  const STORAGE_COMPS = "quickdrop_comps_v1";
+
+  let drops = JSON.parse(localStorage.getItem(STORAGE_DROPS) || "[]");
+  let comps = JSON.parse(localStorage.getItem(STORAGE_COMPS) || "[]");
+
+
+  function formatToday() {
+    const date = new Date();
+
+    document.getElementById("todayDate").textContent =
+      date.toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric"
+      });
+  }
+
+
+  function localDateString(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+
+  function showPage(page, button) {
+
+    document.querySelectorAll(".page").forEach(p =>
+      p.classList.remove("active")
+    );
+
+    document.getElementById(page).classList.add("active");
+
+    document.querySelectorAll(".nav-btn").forEach(b =>
+      b.classList.remove("active")
+    );
+
+    button.classList.add("active");
+
+    const names = {
+      home: "Home",
+      rt: "Radiologic Technology",
+      drop: "Quick Drop",
+      comps: "Competencies",
+      personal: "Personal"
+    };
+
+    document.getElementById("pageTitle").textContent = names[page];
+
+    window.scrollTo(0,0);
+  }
+
+
+  function openDrop(category) {
+
+    document.getElementById("dropModal").classList.add("open");
+    document.getElementById("dropText").focus();
+
+    if (category === "School") {
+      document.getElementById("dropCategory").value = "Assignment";
+    }
+
+    if (category === "Personal") {
+      document.getElementById("dropCategory").value = "Personal";
+    }
+  }
+
+
+  function closeDrop() {
+    document.getElementById("dropModal").classList.remove("open");
+  }
+
+
+  function saveDrop() {
+
+    const text = document.getElementById("dropText").value.trim();
+    const category = document.getElementById("dropCategory").value;
+    const date = document.getElementById("dropDate").value;
+    const time = document.getElementById("dropTime").value;
+
+    if (!text) {
+      alert("Write something first.");
+      return;
+    }
+
+    drops.unshift({
+      id: Date.now(),
+      text,
+      category,
+      date,
+      time,
+      completed: false,
+      createdAt: new Date().toISOString()
+    });
+
+    saveData();
+
+    document.getElementById("dropText").value = "";
+    document.getElementById("dropDate").value = "";
+    document.getElementById("dropTime").value = "";
+    document.getElementById("dropCategory").value = "Personal";
+
+    closeDrop();
+    render();
+  }
+
+
+  function saveData() {
+    localStorage.setItem(STORAGE_DROPS, JSON.stringify(drops));
+    localStorage.setItem(STORAGE_COMPS, JSON.stringify(comps));
+  }
+
+
+  function categoryIcon(category) {
+
+    const icons = {
+      Personal: "👤",
+      Assignment: "📚",
+      Quiz: "🧪",
+      Test: "📝",
+      Clinical: "🏥",
+      Appointment: "📅",
+      Task: "✅",
+      Bill: "💳",
+      Other: "📌"
+    };
+
+    return icons[category] || "📌";
+  }
+
+
+  function prettyDate(date) {
+
+    if (!date) return "No date";
+
+    const d = new Date(date + "T12:00:00");
+
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric"
+    });
+  }
+
+
+  function dropHTML(drop) {
+
+    let meta = drop.category;
+
+    if (drop.date) {
+      meta += " · " + prettyDate(drop.date);
+    }
+
+    if (drop.time) {
+
+      const temp = new Date(`2000-01-01T${drop.time}`);
+
+      meta += " · " + temp.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    }
+
+    return `
+      <div class="item">
+        <div class="icon">${categoryIcon(drop.category)}</div>
+
+        <div class="item-info">
+          <div class="item-title">${escapeHTML(drop.text)}</div>
+          <div class="item-meta">${meta}</div>
+        </div>
+
+        <span class="badge">${drop.category}</span>
+      </div>
+    `;
+  }
+
+
+  function renderDrops() {
+
+    const today = localDateString();
+
+    const todayDrops = drops.filter(d =>
+      d.date === today && !d.completed
+    );
+
+    const upcoming = drops
+      .filter(d => d.date && d.date > today && !d.completed)
+      .sort((a,b) => a.date.localeCompare(b.date))
+      .slice(0,5);
+
+
+    document.getElementById("todayCount").textContent =
+      `${todayDrops.length} ${todayDrops.length === 1 ? "item" : "items"}`;
+
+
+    document.getElementById("todayList").innerHTML =
+      todayDrops.length
+        ? todayDrops.map(dropHTML).join("")
+        : `<div class="empty">Nothing scheduled for today.</div>`;
+
+
+    document.getElementById("upcomingList").innerHTML =
+      upcoming.length
+        ? upcoming.map(dropHTML).join("")
+        : `<div class="empty">Nothing coming up yet.</div>`;
+
+
+    document.getElementById("recentList").innerHTML =
+      drops.length
+        ? drops.slice(0,8).map(dropHTML).join("")
+        : `<div class="empty">Nothing dropped yet.</div>`;
+
+
+    const rtCategories = ["Assignment","Quiz","Test","Clinical"];
+
+    const rtDrops = drops.filter(d =>
+      rtCategories.includes(d.category)
+    );
+
+    document.getElementById("rtList").innerHTML =
+      rtDrops.length
+        ? rtDrops.map(dropHTML).join("")
+        : `<div class="empty">No RT items yet.</div>`;
+
+
+    const personalDrops = drops.filter(d =>
+      !rtCategories.includes(d.category)
+    );
+
+    document.getElementById("personalList").innerHTML =
+      personalDrops.length
+        ? personalDrops.map(dropHTML).join("")
+        : `<div class="empty">No personal items yet.</div>`;
+
+
+    document.getElementById("assignmentCount").textContent =
+      `${drops.filter(d => d.category === "Assignment" && !d.completed).length} active`;
+
+    document.getElementById("testCount").textContent =
+      `${drops.filter(d =>
+        ["Quiz","Test"].includes(d.category) && !d.completed
+      ).length} upcoming`;
+
+    document.getElementById("clinicalCount").textContent =
+      `${drops.filter(d => d.category === "Clinical").length} items`;
+
+    document.getElementById("appointmentCount").textContent =
+      `${drops.filter(d =>
+        d.category === "Appointment" && !d.completed
+      ).length} upcoming`;
+
+    document.getElementById("personalTaskCount").textContent =
+      `${drops.filter(d =>
+        d.category === "Task" && !d.completed
+      ).length} active`;
+
+    document.getElementById("billCount").textContent =
+      `${drops.filter(d =>
+        d.category === "Bill" && !d.completed
+      ).length} upcoming`;
+  }
+
+
+  function addComp() {
+
+    const name = prompt(
+      "Competency name (example: AP Chest)"
+    );
+
+    if (!name || !name.trim()) return;
+
+    comps.push({
+      id: Date.now(),
+      name: name.trim(),
+      completed: false,
+      completedDate: ""
+    });
+
+    saveData();
+    render();
+  }
+
+
+  function toggleComp(id) {
+
+    const comp = comps.find(c => c.id === id);
+
+    if (!comp) return;
+
+    comp.completed = !comp.completed;
+
+    comp.completedDate =
+      comp.completed ? localDateString() : "";
+
+    saveData();
+    render();
+  }
+
+
+  function renderComps() {
+
+    const completed = comps.filter(c => c.completed).length;
+    const total = comps.length;
+    const remaining = total - completed;
+
+    const percent =
+      total ? Math.round((completed / total) * 100) : 0;
+
+
+    document.getElementById("completedComps").textContent = completed;
+    document.getElementById("totalComps").textContent = total;
+    document.getElementById("remainingComps").textContent =
+      `${remaining} remaining`;
+
+    document.getElementById("compPercent").textContent =
+      `${percent}% complete`;
+
+    document.getElementById("compProgress").style.width =
+      `${percent}%`;
+
+
+    document.getElementById("homeCompleted").textContent = completed;
+    document.getElementById("homeTotal").textContent = total;
+
+    document.getElementById("homeRemaining").textContent =
+      `${remaining} remaining`;
+
+    document.getElementById("homePercent").textContent =
+      `${percent}% complete`;
+
+    document.getElementById("homeProgress").style.width =
+      `${percent}%`;
+
+
+    if (!total) {
+
+      document.getElementById("compList").innerHTML =
+        `<div class="empty">Add your required competencies here.</div>`;
+
+      return;
+    }
+
+
+    document.getElementById("compList").innerHTML =
+      comps.map(comp => `
+
+        <div class="comp-row">
+
+          <button
+            class="check ${comp.completed ? "done" : ""}"
+            onclick="toggleComp(${comp.id})"
+          >
+            ${comp.completed ? "✓" : ""}
+          </button>
+
+          <div class="comp-name">
+            ${escapeHTML(comp.name)}
+          </div>
+
+          <span class="badge">
+            ${comp.completed ? "COMPLETE" : "REMAINING"}
+          </span>
+
+        </div>
+
+      `).join("");
+  }
+
+
+  function escapeHTML(value) {
+
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+
+  function render() {
+    renderDrops();
+    renderComps();
+  }
+
+
+  formatToday();
+  render();
+
+</script>
+
+</body>
+</html>
