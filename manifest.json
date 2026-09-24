@@ -1,0 +1,23 @@
+{
+  "name": "QuickDrop",
+  "short_name": "QuickDrop",
+  "description": "Quick capture for reminders, RT school, clinicals and competencies.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b0d12",
+  "theme_color": "#0b0d12",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"}
+  ],
+  "shortcuts": [
+    {
+      "name": "Quick Drop",
+      "short_name": "Drop",
+      "description": "Add a reminder quickly",
+      "url": "./?quickdrop=1",
+      "icons": [{"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"}]
+    }
+  ]
+}
