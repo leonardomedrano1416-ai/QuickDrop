@@ -810,6 +810,24 @@
         <div class="empty">No personal items yet.</div>
       </div>
 
+      <div class="section-title">
+        <h2>QuickDrop Data</h2>
+        <span>Keep a backup</span>
+      </div>
+
+      <div class="card">
+        <div class="item-title">Backup & Restore</div>
+        <div class="item-meta" style="line-height:1.5; margin:7px 0 14px;">
+          Export your drops and competency progress to a backup file. Restore it anytime if your browser data is reset.
+        </div>
+        <div class="row">
+          <button class="cancel" onclick="exportBackup()">Export Backup</button>
+          <button class="save" onclick="document.getElementById('backupFile').click()">Restore Backup</button>
+        </div>
+        <input id="backupFile" type="file" accept="application/json,.json" style="display:none" onchange="restoreBackup(event)">
+        <div class="item-meta" id="backupStatus" style="margin-top:10px;"></div>
+      </div>
+
     </section>
 
   </main>
@@ -1523,6 +1541,69 @@
 
     const fluoroStat = document.getElementById("fluoroDone").parentElement;
     fluoroStat.classList.toggle("requirement-ok", fluoroDone >= 2);
+  }
+
+
+  function exportBackup() {
+    const backup = {
+      app: "QuickDrop",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      drops,
+      comps
+    };
+
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const stamp = localDateString().replaceAll("-", "");
+
+    link.href = url;
+    link.download = `QuickDrop-Backup-${stamp}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    const status = document.getElementById("backupStatus");
+    if (status) status.textContent = "Backup created. Keep the JSON file somewhere safe, such as Files or iCloud Drive.";
+  }
+
+
+  async function restoreBackup(event) {
+    const input = event.target;
+    const file = input.files && input.files[0];
+    if (!file) return;
+
+    try {
+      const parsed = JSON.parse(await file.text());
+
+      if (parsed.app !== "QuickDrop" || !Array.isArray(parsed.drops) || !Array.isArray(parsed.comps)) {
+        throw new Error("This is not a valid QuickDrop backup.");
+      }
+
+      const ok = confirm(
+        `Restore this QuickDrop backup?\n\n${parsed.drops.length} drops\n${parsed.comps.filter(c => c.completed).length} completed competency records\n\nThis will replace the QuickDrop data currently stored on this device.`
+      );
+
+      if (!ok) {
+        input.value = "";
+        return;
+      }
+
+      drops = parsed.drops;
+      comps = parsed.comps;
+      saveData();
+      render();
+
+      const status = document.getElementById("backupStatus");
+      if (status) status.textContent = "Backup restored successfully.";
+      alert("QuickDrop backup restored.");
+    } catch (error) {
+      alert(error.message || "QuickDrop could not restore that backup file.");
+    } finally {
+      input.value = "";
+    }
   }
 
 
