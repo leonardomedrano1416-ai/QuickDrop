@@ -439,6 +439,114 @@
       font-weight: 700;
     }
 
+
+    .comp-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+    }
+
+    .stat-value {
+      margin-top: 6px;
+      font-size: 21px;
+      font-weight: 900;
+    }
+
+    .stat-value small {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .requirement-ok {
+      color: var(--green);
+    }
+
+    .comp-group {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .comp-group summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 15px 16px;
+      cursor: pointer;
+      font-weight: 850;
+    }
+
+    .comp-group summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .comp-group-count {
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .comp-group-body {
+      padding: 0 16px 4px;
+      border-top: 1px solid var(--border);
+    }
+
+    .comp-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .comp-meta {
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+
+    .comp-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .detail-btn {
+      border: 0;
+      background: var(--card2);
+      color: var(--accent2);
+      border-radius: 9px;
+      padding: 6px 8px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .requirement-note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+      margin-top: 10px;
+    }
+
     .danger {
       color: var(--red);
     }
@@ -595,7 +703,7 @@
       <div class="card">
         <div class="progress-number">
           <span id="completedComps">0</span>
-          <small>/ <span id="totalComps">0</span> completed</small>
+          <small>/ 52 imaging requirements</small>
         </div>
 
         <div class="progress-track">
@@ -604,18 +712,53 @@
 
         <div class="progress-meta">
           <span id="compPercent">0% complete</span>
-          <span id="remainingComps">0 remaining</span>
+          <span id="remainingComps">52 remaining</span>
+        </div>
+
+        <div class="requirement-note">
+          ARRT 2027 tracker: 35 mandatory imaging procedures + 17 electives.
+          Patient care is tracked separately below.
+        </div>
+      </div>
+
+      <div class="comp-summary-grid">
+        <div class="stat-card">
+          <div class="stat-label">Mandatory</div>
+          <div class="stat-value"><span id="mandatoryDone">0</span><small> / 35</small></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Electives</div>
+          <div class="stat-value"><span id="electiveDone">0</span><small> / 17</small></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Patient Care</div>
+          <div class="stat-value"><span id="patientCareDone">0</span><small> / 8</small></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Simulations</div>
+          <div class="stat-value"><span id="simulationUsed">0</span><small> / 10 max</small></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Head Elective</div>
+          <div class="stat-value"><span id="headDone">0</span><small> / 1 required</small></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Fluoroscopy</div>
+          <div class="stat-value"><span id="fluoroDone">0</span><small> / 2 required</small></div>
         </div>
       </div>
 
       <div class="section-title">
         <h2>Competencies</h2>
-        <button class="add-btn" onclick="addComp()">＋ Add</button>
+        <span>Tap Details to record a comp</span>
       </div>
 
-      <div class="card" id="compList">
-        <div class="empty">Add your required competencies here.</div>
-      </div>
+      <div id="compList"></div>
 
     </section>
 
@@ -734,13 +877,167 @@
 </div>
 
 
+<!-- COMP DETAILS MODAL -->
+<div class="modal" id="compModal">
+  <div class="modal-sheet">
+    <h2 id="compModalTitle">Competency</h2>
+    <p id="compModalSubtitle"></p>
+
+    <label class="item-meta">Status</label>
+    <select id="compStatus">
+      <option value="remaining">Remaining</option>
+      <option value="completed">Completed</option>
+    </select>
+
+    <label class="item-meta">Date completed</label>
+    <input type="date" id="compDate">
+
+    <label class="item-meta">Completion method</label>
+    <select id="compMethod">
+      <option value="">Not specified</option>
+      <option value="Patient">Patient</option>
+      <option value="Simulation">Simulation</option>
+    </select>
+
+    <label class="item-meta">Clinical site</label>
+    <input type="text" id="compSite" placeholder="Example: Methodist Dallas">
+
+    <label class="item-meta">Verified by</label>
+    <input type="text" id="compVerified" placeholder="Technologist / instructor">
+
+    <label class="item-meta">Notes</label>
+    <textarea id="compNotes" placeholder="Optional notes"></textarea>
+
+    <div class="modal-actions">
+      <button class="cancel" onclick="closeCompModal()">Cancel</button>
+      <button class="save" onclick="saveCompDetails()">Save Competency</button>
+    </div>
+  </div>
+</div>
+
+
 <script>
 
   const STORAGE_DROPS = "quickdrop_drops_v1";
   const STORAGE_COMPS = "quickdrop_comps_v1";
 
   let drops = JSON.parse(localStorage.getItem(STORAGE_DROPS) || "[]");
-  let comps = JSON.parse(localStorage.getItem(STORAGE_COMPS) || "[]");
+  const ARRT_COMPS = [
+    { name:"BLS or ACLS Certified", group:"General Patient Care", type:"Patient Care", simulationEligible:false },
+    { name:"Vital Signs – Blood Pressure", group:"General Patient Care", type:"Patient Care", simulationEligible:true },
+    { name:"Vital Signs – Pulse Rate", group:"General Patient Care", type:"Patient Care", simulationEligible:true },
+    { name:"Vital Signs – Respiration Rate", group:"General Patient Care", type:"Patient Care", simulationEligible:true },
+    { name:"Vital Signs – Pulse Oximetry", group:"General Patient Care", type:"Patient Care", simulationEligible:true },
+    { name:"Sterile and Medical Aseptic Technique", group:"General Patient Care", type:"Patient Care", simulationEligible:true },
+    { name:"Assisted Patient Transfer", group:"General Patient Care", type:"Patient Care", simulationEligible:true },
+    { name:"Care of Patient Medical Equipment", group:"General Patient Care", type:"Patient Care", simulationEligible:true },
+
+    { name:"Chest Routine", group:"Chest and Thorax", type:"Mandatory", simulationEligible:false },
+    { name:"Chest AP – Wheelchair or Stretcher", group:"Chest and Thorax", type:"Mandatory", simulationEligible:false },
+    { name:"Ribs", group:"Chest and Thorax", type:"Mandatory", simulationEligible:true },
+    { name:"Chest Lateral Decubitus", group:"Chest and Thorax", type:"Elective", simulationEligible:true },
+    { name:"Sternum", group:"Chest and Thorax", type:"Elective", simulationEligible:true },
+    { name:"Upper Airway – Soft-Tissue Neck", group:"Chest and Thorax", type:"Elective", simulationEligible:true },
+    { name:"Sternoclavicular Joints", group:"Chest and Thorax", type:"Elective", simulationEligible:true },
+    { name:"Clavicle", group:"Chest and Thorax", type:"Mandatory", simulationEligible:true },
+
+    { name:"Thumb or Finger", group:"Upper Extremity", type:"Mandatory", simulationEligible:true },
+    { name:"Hand", group:"Upper Extremity", type:"Mandatory", simulationEligible:false },
+    { name:"Wrist", group:"Upper Extremity", type:"Mandatory", simulationEligible:false },
+    { name:"Forearm", group:"Upper Extremity", type:"Mandatory", simulationEligible:false },
+    { name:"Elbow", group:"Upper Extremity", type:"Mandatory", simulationEligible:false },
+    { name:"Humerus", group:"Upper Extremity", type:"Mandatory", simulationEligible:true },
+    { name:"Shoulder", group:"Upper Extremity", type:"Mandatory", simulationEligible:false },
+    { name:"Scapula", group:"Upper Extremity", type:"Elective", simulationEligible:true },
+    { name:"AC Joints", group:"Upper Extremity", type:"Elective", simulationEligible:true },
+    { name:"Trauma: Shoulder or Humerus", group:"Upper Extremity", type:"Mandatory", simulationEligible:false },
+    { name:"Trauma: Upper Extremity – Non-Shoulder", group:"Upper Extremity", type:"Mandatory", simulationEligible:false },
+
+    { name:"Toes", group:"Lower Extremity", type:"Elective", simulationEligible:true },
+    { name:"Foot", group:"Lower Extremity", type:"Mandatory", simulationEligible:false },
+    { name:"Ankle", group:"Lower Extremity", type:"Mandatory", simulationEligible:false },
+    { name:"Knee", group:"Lower Extremity", type:"Mandatory", simulationEligible:false },
+    { name:"Tibia-Fibula", group:"Lower Extremity", type:"Mandatory", simulationEligible:true },
+    { name:"Femur", group:"Lower Extremity", type:"Mandatory", simulationEligible:true },
+    { name:"Patella", group:"Lower Extremity", type:"Elective", simulationEligible:true },
+    { name:"Calcaneus", group:"Lower Extremity", type:"Elective", simulationEligible:true },
+    { name:"Trauma: Lower Extremity", group:"Lower Extremity", type:"Mandatory", simulationEligible:false },
+
+    { name:"Skull", group:"Head", type:"Elective", simulationEligible:true },
+    { name:"Facial Bones", group:"Head", type:"Elective", simulationEligible:true },
+    { name:"Mandible", group:"Head", type:"Elective", simulationEligible:true },
+    { name:"Temporomandibular Joints", group:"Head", type:"Elective", simulationEligible:true },
+    { name:"Nasal Bones", group:"Head", type:"Elective", simulationEligible:true },
+    { name:"Orbits", group:"Head", type:"Elective", simulationEligible:true },
+    { name:"Paranasal Sinuses", group:"Head", type:"Elective", simulationEligible:true },
+
+    { name:"Cervical Spine", group:"Spine and Pelvis", type:"Mandatory", simulationEligible:false },
+    { name:"Thoracic Spine", group:"Spine and Pelvis", type:"Mandatory", simulationEligible:true },
+    { name:"Thoracolumbar Spine", group:"Spine and Pelvis", type:"Elective", simulationEligible:true },
+    { name:"Lumbar Spine", group:"Spine and Pelvis", type:"Mandatory", simulationEligible:false },
+    { name:"Cross-Table Lateral Spine – Patient Recumbent", group:"Spine and Pelvis", type:"Elective", simulationEligible:true },
+    { name:"Pelvis", group:"Spine and Pelvis", type:"Mandatory", simulationEligible:false },
+    { name:"Hip", group:"Spine and Pelvis", type:"Mandatory", simulationEligible:false },
+    { name:"Cross-Table Lateral Hip – Patient Recumbent", group:"Spine and Pelvis", type:"Mandatory", simulationEligible:true },
+    { name:"Sacrum and/or Coccyx", group:"Spine and Pelvis", type:"Elective", simulationEligible:true },
+    { name:"Scoliosis Series", group:"Spine and Pelvis", type:"Elective", simulationEligible:true },
+    { name:"Sacroiliac Joints", group:"Spine and Pelvis", type:"Elective", simulationEligible:true },
+
+    { name:"Abdomen Supine", group:"Abdomen", type:"Mandatory", simulationEligible:false },
+    { name:"Abdomen Upright", group:"Abdomen", type:"Mandatory", simulationEligible:true },
+    { name:"Abdomen Decubitus", group:"Abdomen", type:"Elective", simulationEligible:true },
+    { name:"Nasogastric/Enteric or Orogastric/Enteric Tube", group:"Abdomen", type:"Elective", simulationEligible:false },
+
+    { name:"Upper GI Series – Single or Double Contrast", group:"Fluoroscopy Studies", type:"Elective", simulationEligible:false },
+    { name:"Contrast Enema – Single or Double Contrast", group:"Fluoroscopy Studies", type:"Elective", simulationEligible:false },
+    { name:"Small Bowel Series", group:"Fluoroscopy Studies", type:"Elective", simulationEligible:false },
+    { name:"Esophagus", group:"Fluoroscopy Studies", type:"Elective", simulationEligible:false },
+    { name:"Cystography/Cystourethrography", group:"Fluoroscopy Studies", type:"Elective", simulationEligible:false },
+    { name:"ERCP", group:"Fluoroscopy Studies", type:"Elective", simulationEligible:false },
+    { name:"Myelography / Lumbar Puncture / Epidural Injections", group:"Fluoroscopy Studies", type:"Elective", simulationEligible:false },
+    { name:"Arthrography / Joint Injection / Aspiration", group:"Fluoroscopy Studies", type:"Elective", simulationEligible:false },
+    { name:"Hysterosalpingography", group:"Fluoroscopy Studies", type:"Elective", simulationEligible:false },
+
+    { name:"C-Arm Procedure – Multiple Projections", group:"Mobile C-Arm Studies", type:"Mandatory", simulationEligible:true },
+    { name:"Surgical C-Arm Procedure – Sterile Field", group:"Mobile C-Arm Studies", type:"Mandatory", simulationEligible:true },
+
+    { name:"Chest", group:"Mobile Radiographic Studies", type:"Mandatory", simulationEligible:false },
+    { name:"Abdomen", group:"Mobile Radiographic Studies", type:"Mandatory", simulationEligible:false },
+    { name:"Upper or Lower Extremity", group:"Mobile Radiographic Studies", type:"Mandatory", simulationEligible:false },
+
+    { name:"Chest Routine", group:"Pediatric Patient", type:"Elective", simulationEligible:false },
+    { name:"Upper or Lower Extremity", group:"Pediatric Patient", type:"Elective", simulationEligible:false },
+    { name:"Abdomen", group:"Pediatric Patient", type:"Elective", simulationEligible:false },
+    { name:"Mobile Study", group:"Pediatric Patient", type:"Elective", simulationEligible:false },
+
+    { name:"Chest Routine", group:"Geriatric Patient", type:"Mandatory", simulationEligible:false },
+    { name:"Upper or Lower Extremity", group:"Geriatric Patient", type:"Mandatory", simulationEligible:false },
+    { name:"Hip or Spine", group:"Geriatric Patient", type:"Mandatory", simulationEligible:false }
+  ];
+
+  const storedComps = JSON.parse(localStorage.getItem(STORAGE_COMPS) || "[]");
+
+  let comps = ARRT_COMPS.map((item, index) => {
+    const old = storedComps.find(c =>
+      c.name === item.name &&
+      (!c.group || c.group === item.group)
+    );
+
+    return {
+      id: index + 1,
+      ...item,
+      completed: old?.completed || false,
+      completedDate: old?.completedDate || "",
+      completionMethod: old?.completionMethod || "",
+      clinicalSite: old?.clinicalSite || "",
+      verifiedBy: old?.verifiedBy || "",
+      notes: old?.notes || ""
+    };
+  });
+
+  localStorage.setItem(STORAGE_COMPS, JSON.stringify(comps));
+
+  let activeCompId = null;
 
 
   function formatToday() {
@@ -1002,54 +1299,131 @@
   }
 
 
-  function addComp() {
+  function toggleComp(id) {
+    const comp = comps.find(c => c.id === id);
+    if (!comp) return;
 
-    const name = prompt(
-      "Competency name (example: AP Chest)"
-    );
+    comp.completed = !comp.completed;
 
-    if (!name || !name.trim()) return;
-
-    comps.push({
-      id: Date.now(),
-      name: name.trim(),
-      completed: false,
-      completedDate: ""
-    });
+    if (comp.completed) {
+      comp.completedDate = comp.completedDate || localDateString();
+      comp.completionMethod = comp.completionMethod || "Patient";
+    } else {
+      comp.completedDate = "";
+      comp.completionMethod = "";
+    }
 
     saveData();
     render();
   }
 
 
-  function toggleComp(id) {
-
+  function openCompModal(id) {
     const comp = comps.find(c => c.id === id);
-
     if (!comp) return;
 
-    comp.completed = !comp.completed;
+    activeCompId = id;
 
-    comp.completedDate =
-      comp.completed ? localDateString() : "";
+    document.getElementById("compModalTitle").textContent = comp.name;
+    document.getElementById("compModalSubtitle").textContent =
+      `${comp.group} · ${comp.type}${comp.simulationEligible ? " · Simulation eligible" : ""}`;
+
+    document.getElementById("compStatus").value =
+      comp.completed ? "completed" : "remaining";
+
+    document.getElementById("compDate").value = comp.completedDate || "";
+    document.getElementById("compMethod").value = comp.completionMethod || "";
+    document.getElementById("compSite").value = comp.clinicalSite || "";
+    document.getElementById("compVerified").value = comp.verifiedBy || "";
+    document.getElementById("compNotes").value = comp.notes || "";
+
+    const method = document.getElementById("compMethod");
+    const simulationOption = [...method.options].find(o => o.value === "Simulation");
+    simulationOption.disabled = !comp.simulationEligible;
+
+    if (!comp.simulationEligible && method.value === "Simulation") {
+      method.value = "";
+    }
+
+    document.getElementById("compModal").classList.add("open");
+  }
+
+
+  function closeCompModal() {
+    document.getElementById("compModal").classList.remove("open");
+    activeCompId = null;
+  }
+
+
+  function saveCompDetails() {
+    const comp = comps.find(c => c.id === activeCompId);
+    if (!comp) return;
+
+    const completed =
+      document.getElementById("compStatus").value === "completed";
+
+    const method = document.getElementById("compMethod").value;
+
+    if (method === "Simulation" && !comp.simulationEligible) {
+      alert("ARRT does not list this imaging procedure as eligible for simulation.");
+      return;
+    }
+
+    comp.completed = completed;
+    comp.completedDate = completed
+      ? (document.getElementById("compDate").value || localDateString())
+      : "";
+
+    comp.completionMethod = completed ? method : "";
+    comp.clinicalSite = document.getElementById("compSite").value.trim();
+    comp.verifiedBy = document.getElementById("compVerified").value.trim();
+    comp.notes = document.getElementById("compNotes").value.trim();
 
     saveData();
+    closeCompModal();
     render();
   }
 
 
   function renderComps() {
+    const mandatoryDone =
+      comps.filter(c => c.type === "Mandatory" && c.completed).length;
 
-    const completed = comps.filter(c => c.completed).length;
-    const total = comps.length;
-    const remaining = total - completed;
+    const electiveCompleted =
+      comps.filter(c => c.type === "Elective" && c.completed).length;
 
-    const percent =
-      total ? Math.round((completed / total) * 100) : 0;
+    const electiveDone = Math.min(electiveCompleted, 17);
 
+    const patientCareDone =
+      comps.filter(c => c.type === "Patient Care" && c.completed).length;
 
-    document.getElementById("completedComps").textContent = completed;
-    document.getElementById("totalComps").textContent = total;
+    const headDone =
+      comps.filter(c =>
+        c.group === "Head" &&
+        c.type === "Elective" &&
+        c.completed
+      ).length;
+
+    const fluoroDone =
+      comps.filter(c =>
+        c.group === "Fluoroscopy Studies" &&
+        c.type === "Elective" &&
+        c.completed
+      ).length;
+
+    const simulationUsed =
+      comps.filter(c =>
+        c.type !== "Patient Care" &&
+        c.completed &&
+        c.completionMethod === "Simulation"
+      ).length;
+
+    const imagingDone = mandatoryDone + electiveDone;
+    const imagingTotal = 52;
+    const remaining = Math.max(0, imagingTotal - imagingDone);
+    const percent = Math.round((imagingDone / imagingTotal) * 100);
+
+    document.getElementById("completedComps").textContent = imagingDone;
     document.getElementById("remainingComps").textContent =
       `${remaining} remaining`;
 
@@ -1059,52 +1433,87 @@
     document.getElementById("compProgress").style.width =
       `${percent}%`;
 
+    document.getElementById("mandatoryDone").textContent = mandatoryDone;
+    document.getElementById("electiveDone").textContent = electiveDone;
+    document.getElementById("patientCareDone").textContent = patientCareDone;
+    document.getElementById("simulationUsed").textContent = simulationUsed;
+    document.getElementById("headDone").textContent = Math.min(headDone, 1);
+    document.getElementById("fluoroDone").textContent = Math.min(fluoroDone, 2);
 
-    document.getElementById("homeCompleted").textContent = completed;
-    document.getElementById("homeTotal").textContent = total;
-
+    document.getElementById("homeCompleted").textContent = imagingDone;
+    document.getElementById("homeTotal").textContent = imagingTotal;
     document.getElementById("homeRemaining").textContent =
       `${remaining} remaining`;
-
     document.getElementById("homePercent").textContent =
       `${percent}% complete`;
-
     document.getElementById("homeProgress").style.width =
       `${percent}%`;
 
-
-    if (!total) {
-
-      document.getElementById("compList").innerHTML =
-        `<div class="empty">Add your required competencies here.</div>`;
-
-      return;
-    }
-
+    const groups = [...new Set(comps.map(c => c.group))];
 
     document.getElementById("compList").innerHTML =
-      comps.map(comp => `
+      groups.map((group, groupIndex) => {
+        const groupComps = comps.filter(c => c.group === group);
+        const groupDone = groupComps.filter(c => c.completed).length;
 
-        <div class="comp-row">
+        return `
+          <details class="comp-group" ${groupIndex === 0 ? "open" : ""}>
+            <summary>
+              <span>${escapeHTML(group)}</span>
+              <span class="comp-group-count">${groupDone}/${groupComps.length} completed</span>
+            </summary>
 
-          <button
-            class="check ${comp.completed ? "done" : ""}"
-            onclick="toggleComp(${comp.id})"
-          >
-            ${comp.completed ? "✓" : ""}
-          </button>
+            <div class="comp-group-body">
+              ${groupComps.map(comp => {
+                const method =
+                  comp.completed && comp.completionMethod
+                    ? ` · ${comp.completionMethod}`
+                    : "";
 
-          <div class="comp-name">
-            ${escapeHTML(comp.name)}
-          </div>
+                const sim =
+                  comp.simulationEligible && comp.type !== "Patient Care"
+                    ? " · Simulation eligible"
+                    : "";
 
-          <span class="badge">
-            ${comp.completed ? "COMPLETE" : "REMAINING"}
-          </span>
+                return `
+                  <div class="comp-row">
+                    <button
+                      class="check ${comp.completed ? "done" : ""}"
+                      onclick="toggleComp(${comp.id})"
+                      aria-label="Toggle ${escapeHTML(comp.name)}"
+                    >
+                      ${comp.completed ? "✓" : ""}
+                    </button>
 
-        </div>
+                    <div class="comp-info">
+                      <div class="comp-name">${escapeHTML(comp.name)}</div>
+                      <div class="comp-meta">
+                        ${escapeHTML(comp.type)}${sim}${method}
+                        ${comp.completedDate ? ` · ${prettyDate(comp.completedDate)}` : ""}
+                      </div>
+                    </div>
 
-      `).join("");
+                    <div class="comp-actions">
+                      <button class="detail-btn" onclick="openCompModal(${comp.id})">
+                        Details
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </details>
+        `;
+      }).join("");
+
+    const simulationStat = document.getElementById("simulationUsed").parentElement;
+    simulationStat.classList.toggle("danger", simulationUsed > 10);
+
+    const headStat = document.getElementById("headDone").parentElement;
+    headStat.classList.toggle("requirement-ok", headDone >= 1);
+
+    const fluoroStat = document.getElementById("fluoroDone").parentElement;
+    fluoroStat.classList.toggle("requirement-ok", fluoroDone >= 2);
   }
 
 
